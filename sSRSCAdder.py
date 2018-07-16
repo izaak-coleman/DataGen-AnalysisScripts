@@ -43,6 +43,7 @@ def load_fasta(fname):
   return header[1:], ''.join(data)
 
 def add_clusters(chromosome, fasta, base_name, ranges, max_k):
+  fasta = list(fasta)
   sSRSC_lists = [[] for i in range(0,max_k)]
   # Add sSRSC.
   for l,h in ranges:
@@ -58,6 +59,7 @@ def add_clusters(chromosome, fasta, base_name, ranges, max_k):
       sSRSC_lists[k-1].append(chromosome + "\t%d\t%s\t%s\n" % (l+m, c, t))
 
   # Write data.
+  fasta = ''.join(fasta)
   fasta_file = base_name + 'sSRSC.fasta'
   with open(fasta_file,'w') as f:
     f.write('\n'.join([fasta[i:i+80] for i in range(0,len(fasta), 100)]))
@@ -70,7 +72,7 @@ def addSNV(pos, fasta):
   control = fasta[pos]
   bases = 'ATCG'.replace(control,'')
   tumour = random.choice(bases)
-  fasta  = fasta[:pos] + tumour + fasta[pos+1:]
+  fasta = fasta[pos] = tumour
   return control, tumour, fasta
   
 
