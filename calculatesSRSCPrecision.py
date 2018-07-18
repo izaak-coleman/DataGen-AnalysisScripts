@@ -43,4 +43,17 @@ def loadsSRSCLists(base_name, k_max):
       snvs = [l.strip().split('\t') for l in f]
       snvs = [(e[0], int(e[1]), e[2], e[3]) for e in snvs]
     snvs = sorted(snvs, key=lambda x : x[1])
-    all_sSRSCs[k-1] = all_sSRSCs[k] + splitIntosSRSC(snvs)
+    all_sSRSCs[k-1] = all_sSRSCs[k-1] + splitIntosSRSC(snvs)
+
+def countFalsePositives(real_sSRSC, called_sSRSC):
+  k_false_positives = [0 for i in range(0, len(real_sSRSC))]
+  for k in range(0, len(real_sSRSC)):
+    for c in real_sSRSC[k]:
+      index = findCluster(c, called_sSRSC)
+      if index == -1:
+        continue # caller did not find any SNVs in c
+      e = called_sSRSC.pop(index)
+      k_false_positives[k] = k_false_positives[k] + numberOfFPsInCluster(e,c)
+    remaining_k_sSRSC = [e for e in real_sSRSC if len(e) == k]
+    for e in remaining_k_sSRSC:
+      k_false_positives[k] = k_false_positives[k] + len(e)
