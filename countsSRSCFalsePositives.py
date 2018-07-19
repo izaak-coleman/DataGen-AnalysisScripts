@@ -65,6 +65,7 @@ def countFalsePositivesByK(real_sSRSC, called_sSRSC):
       k_false_positives[k] = k_false_positives[k] + len(e)
   return k_false_positives
 
+
 def findClusterIndex(c, called_sSRSC):
   for i in range(0, len(called_sSRSC)):
     for snv in c:
