@@ -20,5 +20,5 @@ def mlistToCalls(fname):
 def vcfToCalls(fname):
   with open(fname) as f:
     calls = [l.strip().split('\t') for l in f]
-    calls[('chr'+e[0], int(e[1]), e[3], e[4]) for e in calls]
+    calls = [('chr'+e[0], int(e[1]), e[3], e[4]) for e in calls]
     return calls
