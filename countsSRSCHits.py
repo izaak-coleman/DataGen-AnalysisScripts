@@ -15,6 +15,17 @@ def countsSRSCHitsByK(base_name, called_sSRSC, k_max):
     sSRSC_hits_by_k[k-1] = n_hits
   return sSRSC_hits_by_k
 
+def countTotalsSRSCByK(base_name, k_max):
+  total_by_k = []
+  for k in range(1, int(k_max)+1):
+    m_fname = base_name + 'm.' + str(k) + '.mlist'
+    p_fname = base_name + 'p.' + str(k) + '.mlist'
+    k_sSRSC = callFormater.mlistToCalls(m_fname)
+    k_sSRSC = k_sSRSC + callFormater.mlistToCalls(p_fname)
+    total_by_k.append(len(k_sSRSC))
+  return total_by_k
+
+
 def main():
   if len(sys.argv) != 4:
     print("Usage <exe> <mlist_base_name> <k> <gedi_calls>")
