@@ -16,7 +16,7 @@ def calculateSensitivity(pairs, k_max):
   all_dataset_caller_hit  = [0 for i in range(0,k_max)]
   for base_name, call_file in pairs:
     total_snv_by_k = h.countTotalsSRSCByK(base_name, int(k_max))
-    caller_sSRSC = callFormater.gediToCalls(call_file)
+    caller_sSRSC = callFormater.mutectToCalls(call_file)
     caller_hits_by_k = h.countsSRSCHitsByK(base_name, caller_sSRSC, int(k_max))
     for k in range(0, k_max):
       all_dataset_snv_total[k] = all_dataset_snv_total[k] + total_snv_by_k[k]
@@ -34,10 +34,10 @@ def calculatePrecision(pairs, k_max):
   all_dataset_caller_hit = [0 for i in range(0,k_max)]
   all_dataset_false_positive = [0 for i in range(0,k_max)]
   for base_name, call_file in pairs:
-    caller_sSRSC = callFormater.gediToCalls(call_file)
+    caller_sSRSC = callFormater.mutectToCalls(call_file)
     caller_hits_by_k = h.countsSRSCHitsByK(base_name, caller_sSRSC, int(k_max))
     real_sSRSC = fp.loadsSRSCLists(base_name, int(k_max))
-    gedi_sSRSC = fp.splitIntosSRSC(callFormater.gediToCalls(call_file))
+    gedi_sSRSC = fp.splitIntosSRSC(callFormater.mutectToCalls(call_file))
     caller_fp_by_k = fp.countFalsePositivesByK(real_sSRSC, gedi_sSRSC)
 
     for k in range(0, k_max):
@@ -57,14 +57,11 @@ def main():
     print("Usage: <exe> <basename/caller dataset pair list> <max_k>")
     sys.exit(1)
   pairs = parseDatasets(sys.argv[1])
-  sens = calculateSensitivity(pairs, int(sys.argv[2]))
+  recall = calculateSensitivity(pairs, int(sys.argv[2]))
   prec = calculatePrecision(pairs, int(sys.argv[2]))
-  print "SENSITIVITY"
-  for e in sens:
-    print e
-  print "PRECISION"
-  for e in prec:
-    print e
+  print("k,recall,precision")
+  for i in range(1,int(sys.argv[2])+1):
+    print "%d, %.2f, %.2f" % (i, recall[i-1], prec[i-1])
 
 
 

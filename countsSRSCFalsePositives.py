@@ -49,23 +49,24 @@ def countFalsePositivesByK(real_sSRSC, called_sSRSC):
   k_false_positives = [0 for i in range(0, len(real_sSRSC))]
   for k in range(0, len(real_sSRSC)):
     for c in real_sSRSC[k]:
-      print '\n'
-      print called_sSRSC
-      print c
       index = findClusterIndex(c, called_sSRSC)
-      print index
       if index == -1:
         continue # caller did not find any SNVs in c
-      e = called_sSRSC.pop(index)
-      print "N FP in clust: ", numberOfFPsInCluster(e,c)
+      e = called_sSRSC[index]
       k_false_positives[k] = k_false_positives[k] + numberOfFPsInCluster(e,c)
     remaining_k_sSRSC = [e for e in called_sSRSC if len(e) == (k+1)]
-    print "remaining k sSRSC", (k+1), remaining_k_sSRSC
     for e in remaining_k_sSRSC:
-      k_false_positives[k] = k_false_positives[k] + len(e)
+      if not genuinesSRSC(e, real_sSRSC):
+        k_false_positives[k] = k_false_positives[k] + len(e)
   return k_false_positives
 
-
+def genuinesSRSC(e, real_sSRSC):
+  for call in e:
+    for k_group in real_sSRSC:
+      for sSRSC in k_group:
+        if call in sSRSC:
+          return True 
+  return False # no association of any calls with any sSRSC
 def findClusterIndex(c, called_sSRSC):
   for i in range(0, len(called_sSRSC)):
     for snv in c:
@@ -86,7 +87,7 @@ def main():
     print("Usage <exe> <mlist_base_name> <k> <gedi_calls>")
     sys.exit(1)
   real_sSRSC = loadsSRSCLists(sys.argv[1], sys.argv[2]) # mlist base, k
-  gedi_sSRSC = splitIntosSRSC(callFormater.gediToCalls(sys.argv[3]))
+  gedi_sSRSC = splitIntosSRSC(callFormater.mutectToCalls(sys.argv[3]))
   for e in gedi_sSRSC:
     print e
   false_positives_by_k = countFalsePositivesByK(real_sSRSC, gedi_sSRSC)

@@ -8,13 +8,15 @@ def mutectToCalls(fname):
 def gediToCalls(fname):
   with open(fname) as f:
     calls = [l.strip().split('\t') for l in f]
+    if calls[0][0] == 'Mut_ID':
+      calls.pop(0)
     calls = [(e[2], int(e[3]), e[4], e[5]) for e in calls]
   return calls
 
 def mlistToCalls(fname):
   with open(fname) as f:
     calls = [l.strip().split('\t') for l in f]
-    calls = [(e[1], int(e[2]), e[3], e[4]) for e in calls]
+    calls = [(e[0], int(e[1]), e[2], e[3]) for e in calls]
   return calls
 
 def vcfToCalls(fname):
