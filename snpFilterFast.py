@@ -1,40 +1,52 @@
 import sys
-
-def snpFilter(snp_fname, calls_fname):
-  snps = []
-  calls = []
-  snp_site = []
-  var_dict = {}
-  with open(snp_fname) as f:
-    snps = [l.strip().split('\t') for l in f]
-    snp_site = [(e[0], e[1]) for e in snps]
-    for i in range(0,len(snp_site)):
-      var_dict[snp_site[i][0] + snp_site[i][1]] = snps[i][7].split('/')
-
-  with open(calls_fname) as f:
-    calls = [l.strip().split('\t') for l in f]
-    calls.pop(0)
-  snp_filtered_calls = []
-  snp_removed = []
+import callFormater
+def snpFilter(calls, snps):
+  print("Running filter")
   for call in calls:
-    if not snp(call, snp_site, var_dict):
-      snp_filtered_calls.append('\t'.join(call))
-    else:
-      snp_removed.append('\t'.join(call))
-  with open(calls_fname+'.snp_fil','w') as f:
-    f.write('\n'.join(snp_filtered_calls))
-  with open(calls_fname+'.snp_rem','w') as f:
-    f.write('\n'.join(snp_removed))
+    index = binary_search(call, snps)
+    if index != -1:
+      print snps[index]
 
-def snp(call, snp_site, var_dict):
-  _,_,c,pos,h,t = call
-  return ((c,pos) in snp_site) and ((h in var_dict[c+pos]) and (t in var_dict[c+pos]))
+def binary_search(call, snps):
+  left = 0
+  right = len(snps)
+  mid = -1
+  hit = False
+  while left < right:
+    mid = (left + right) / 2
+    snp = snps[mid].split('\t')
+    snp_pos = int(snp[1])
+    if snp_pos == call[1]:
+      hit = True
+      break
+    elif snp_pos > call[1]:
+      right = mid
+    else:
+      left = mid + 1
+
+  if not hit:
+    return -1
+
+  # loop to start of hits with same position
+  while int(snps[mid-1].split('\t')[1]) == call[1]:
+    mid = mid - 1
+
+  while int(snps[mid].split('\t')[1]) == call[1]:
+    if snps[mid].split('\t')[0] == call[0]:
+      return mid
+    mid = mid + 1
+  return -1
 
 def main():
   if len(sys.argv) != 3:
     print("Usage: <exe> <snp_file> <calls_file>")
     sys.exit(1)
-  snpFilter(sys.argv[1], sys.argv[2])
+  print("Loading data")
+  calls = callFormater.gediToCalls(sys.argv[2])
+  snps = []
+  with open(sys.argv[1]) as f:
+    snps = [l.strip() for l in f]
+  snpFilter(calls, snps)
 
 if __name__ == "__main__":
   main()
