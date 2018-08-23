@@ -48,7 +48,10 @@ def countDistribution(all_calls, max_k, w):
   # count sSRSC distribution
   k_dist = []
   for k_sSRSCs in sSRSCs_by_k:
-    k_dist.append(len(k_sSRSCs))
+    counter = 0
+    for sSRSC in k_sSRSCs:
+      counter = counter + len(sSRSC)
+    k_dist.append(counter)
 
   return k_dist, sSRSCs_by_k
 
@@ -80,7 +83,7 @@ def main():
   k_dist, sSRSCs_by_k = countDistribution(all_calls, max_k, w)
 
   printKDistribution(k_dist)
-  writesSRSCs(sSRSCs_by_k, sys.argv[1][:-12])
+#  writesSRSCs(sSRSCs_by_k, sys.argv[1][:-12])
 
 if __name__ == '__main__':
   main()
